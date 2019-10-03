@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Configure this Atom feed</h1>
+
+{% for parameter in parameters %}
+<h2>{{ PARAMETER_NAMES[parameter] }}</h2>
+{% for column in columns %}
+    <a href="?_{{ parameter }}={{ column|urlencode }}">{{ column }}</a>{% if not loop.last %}, {% endif %}
+{% endfor %}
+
+{% endfor %}
+
+{% endblock %}
