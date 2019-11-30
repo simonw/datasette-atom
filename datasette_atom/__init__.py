@@ -36,7 +36,7 @@ def render_atom(args, data, view_name):
         title += ": " + data["human_description_en"]
     fg.title(title)
     # And the rows
-    for row in data["rows"]:
+    for row in reversed(data["rows"]):
         entry = fg.add_entry()
         entry.id(row["atom_id"])
         entry.content(row["atom_content"], type="text")

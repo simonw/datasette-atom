@@ -5,20 +5,31 @@ import urllib.parse
 EXPECTED_ATOM = """
 <?xml version='1.0' encoding='UTF-8'?>
 <feed xmlns="http://www.w3.org/2005/Atom">
-  <id>:memory:/fb1e7a9ccb71dcf0e87071fab748b133bb1f7f5e43a1f5ac8a6dff99caf11cac</id>
+  <id>:memory:/051e4d600fc8678005e17f13e1b4065a14833423d0da19f4f34aaeab87822cd4</id>
   <title>
     select
         'atom-id' as atom_id,
         'title' as atom_title,
         '2019-10-23T21:32:12-07:00' as atom_updated,
+        'blah' as atom_content
+    union select
+        'atom-id-2' as atom_id,
+        'title 2' as atom_title,
+        '2019-09-23T21:32:12-07:00' as atom_updated,
         'blah' as atom_content;
     </title>
   <updated>2019-10-23T21:32:12-07:00</updated>
-  <generator uri="https://github.com/simonw/datasette" version="{version}">Datasette</generator>
+  <generator uri="https://github.com/simonw/datasette" version="0.32">Datasette</generator>
   <entry>
     <id>atom-id</id>
     <title>title</title>
     <updated>2019-10-23T21:32:12-07:00</updated>
+    <content type="text">blah</content>
+  </entry>
+  <entry>
+    <id>atom-id-2</id>
+    <title>title 2</title>
+    <updated>2019-09-23T21:32:12-07:00</updated>
     <content type="text">blah</content>
   </entry>
 </feed>
@@ -62,6 +73,11 @@ def test_atom_for_valid_query():
         'atom-id' as atom_id,
         'title' as atom_title,
         '2019-10-23T21:32:12-07:00' as atom_updated,
+        'blah' as atom_content
+    union select
+        'atom-id-2' as atom_id,
+        'title 2' as atom_title,
+        '2019-09-23T21:32:12-07:00' as atom_updated,
         'blah' as atom_content;
     """
     app = make_app_client()
