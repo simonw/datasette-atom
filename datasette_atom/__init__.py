@@ -1,3 +1,4 @@
+import bleach
 from datasette import hookimpl, __version__
 from feedgen.feed import FeedGenerator
 import hashlib
@@ -39,7 +40,10 @@ def render_atom(args, data, view_name):
     for row in reversed(data["rows"]):
         entry = fg.add_entry()
         entry.id(row["atom_id"])
-        entry.content(row["atom_content"], type="text")
+        if "atom_content_html" in columns:
+            entry.content(clean(row["atom_content_html"]), type="html")
+        elif "atom_content" in columns:
+            entry.content(row["atom_content"], type="text")
         entry.updated(row["atom_updated"])
         entry.title(row["atom_title"])
         # atom_link is optional
@@ -50,3 +54,36 @@ def render_atom(args, data, view_name):
         "content_type": "application/xml; charset=utf-8",
         "status_code": 200,
     }
+
+
+def clean(html):
+    print("cleaning: ", html)
+    cleaned = bleach.clean(
+        html,
+        tags=[
+            "a",
+            "abbr",
+            "acronym",
+            "b",
+            "blockquote",
+            "code",
+            "em",
+            "i",
+            "li",
+            "ol",
+            "strong",
+            "ul",
+            "pre",
+            "p",
+            "h1",
+            "h2",
+            "h3",
+            "h4",
+            "h5",
+            "h6",
+            "img",
+        ],
+        attributes={"a": ["href", "title"], "img": ["alt", "src"]},
+    )
+    print("cleaned", cleaned)
+    return cleaned
