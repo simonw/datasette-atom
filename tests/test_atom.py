@@ -19,7 +19,7 @@ EXPECTED_ATOM = """
         'blah' as atom_content;
     </title>
   <updated>2019-10-23T21:32:12-07:00</updated>
-  <generator uri="https://github.com/simonw/datasette" version="0.32">Datasette</generator>
+  <generator uri="https://github.com/simonw/datasette" version="{version}">Datasette</generator>
   <entry>
     <id>atom-id</id>
     <title>title</title>
@@ -48,7 +48,7 @@ EXPECTED_ATOM_WITH_LINK = """
         'blah' as atom_content;
     </title>
   <updated>2019-10-23T21:32:12-07:00</updated>
-  <generator uri="https://github.com/simonw/datasette" version="0.32">Datasette</generator>
+  <generator uri="https://github.com/simonw/datasette" version="{version}">Datasette</generator>
   <entry>
     <id>atom-id</id>
     <title>title</title>
