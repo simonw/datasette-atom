@@ -3,22 +3,33 @@ from feedgen.feed import FeedGenerator
 import hashlib
 import html
 
+REQUIRED_COLUMNS = {"atom_id", "atom_updated", "atom_title"}
+
 
 @hookimpl
-def register_output_renderer(datasette):
+def register_output_renderer():
     return {"extension": "atom", "callback": render_atom}
 
 
 def render_atom(args, data, view_name):
-    # print(args)
-    # import json
-    # print(json.dumps(data, default=repr, indent=2))
+    from datasette.views.base import DatasetteError
+
+    columns = set(data["columns"])
+    if not REQUIRED_COLUMNS.issubset(columns):
+        raise DatasetteError(
+            "SQL query must return columns {}".format(", ".join(REQUIRED_COLUMNS)),
+            status=400,
+        )
     fg = FeedGenerator()
-    fg.generator(generator="Datasette", version=__version__, uri="https://github.com/simonw/datasette")
+    fg.generator(
+        generator="Datasette",
+        version=__version__,
+        uri="https://github.com/simonw/datasette",
+    )
     sql = data["query"]["sql"]
     fg.id(data["database"] + "/" + hashlib.sha256(sql.encode("utf8")).hexdigest())
-    fg.subtitle(sql)
-    title = data["database"]
+    fg.updated(max(row["atom_updated"] for row in data["rows"]))
+    title = args.get("_feed_title", sql)
     if data.get("table"):
         title += "/" + data["table"]
     if data.get("human_description_en"):
@@ -27,30 +38,15 @@ def render_atom(args, data, view_name):
     # And the rows
     for row in data["rows"]:
         entry = fg.add_entry()
-        entry.id(repr(list(row)))
-        entry.content(build_content(row), type="html")
-        entry.title(repr(list(row)))
-    if dict(args).get("_rss"):
-        # Link is required for RSS:
-        fg.link(href="https://example.com/")
-        body = fg.rss_str(pretty=True)
-    else:
-        body = fg.atom_str(pretty=True)
+        entry.id(row["atom_id"])
+        entry.content(row["atom_content"], type="text")
+        entry.updated(row["atom_updated"])
+        entry.title(row["atom_title"])
+        # atom_link is optional
+        if "atom_link" in columns:
+            entry.link(href=row["atom_link"])
     return {
-        "body": body,
+        "body": fg.atom_str(pretty=True),
         "content_type": "application/xml; charset=utf-8",
         "status_code": 200,
     }
-
-
-def build_content(row):
-    bits = []
-    for key, value in row.items():
-        if isinstance(value, dict) and {"value", "label"} == set(value.keys()):
-            value = '{} <span style="color: #666; font-size: 0.8em">({})</span>'.format(
-                html.escape(value["label"]), html.escape(str(value["value"]))
-            )
-        else:
-            value = html.escape(str(value))
-        bits.append('<p><strong>{}</strong>: {}</p>'.format(html.escape(str(key)), value))
-    return repr('\n'.join(bits))

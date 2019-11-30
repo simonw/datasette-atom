@@ -24,10 +24,6 @@ setup(
     packages=["datasette_atom"],
     entry_points={"datasette": ["atom = datasette_atom"]},
     install_requires=["datasette", "feedgen"],
-    extras_require={
-        "test": [
-            "pytest"
-        ]
-    },
+    extras_require={"test": ["pytest", "asgiref"]},
     tests_require=["datasette-atom[test]"],
 )
