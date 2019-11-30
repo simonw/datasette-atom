@@ -46,7 +46,7 @@ jobs:
             . venv/bin/activate
             pip install -e .
             pip install pytest
-            # pytest
+            pytest
   test-python-install:
     parameters:
       version:
@@ -74,7 +74,7 @@ jobs:
             . venv/bin/activate
             pip install -e .
             pip install pytest
-            # pytest
+            pytest
   deploy:
     docker:
       - image: circleci/python:3.6
