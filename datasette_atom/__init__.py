@@ -39,13 +39,13 @@ def render_atom(args, data, view_name):
     # And the rows
     for row in reversed(data["rows"]):
         entry = fg.add_entry()
-        entry.id(row["atom_id"])
+        entry.id(str(row["atom_id"]))
         if "atom_content_html" in columns:
             entry.content(clean(row["atom_content_html"]), type="html")
         elif "atom_content" in columns:
             entry.content(row["atom_content"], type="text")
         entry.updated(row["atom_updated"])
-        entry.title(row["atom_title"])
+        entry.title(str(row["atom_title"]))
         # atom_link is optional
         if "atom_link" in columns:
             entry.link(href=row["atom_link"])

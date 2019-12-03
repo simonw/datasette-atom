@@ -5,11 +5,11 @@ import urllib.parse
 EXPECTED_ATOM = """
 <?xml version='1.0' encoding='UTF-8'?>
 <feed xmlns="http://www.w3.org/2005/Atom">
-  <id>:memory:/39bc789d72a452f4a15a457f90c47138a2f3f89796d4549ee4a050c61f28e3fe</id>
+  <id>:memory:/8bec181fc0b493a38da7c73d9c5e13331e3acfaceb300eeddf6847179edede7c</id>
   <title>
     select
-        'atom-id' as atom_id,
-        'title' as atom_title,
+        1 as atom_id,
+        123 as atom_title,
         '2019-10-23T21:32:12-07:00' as atom_updated,
         'blah &lt;b&gt;Bold&lt;/b&gt;' as atom_content
     union select
@@ -21,8 +21,8 @@ EXPECTED_ATOM = """
   <updated>2019-10-23T21:32:12-07:00</updated>
   <generator uri="https://github.com/simonw/datasette" version="{version}">Datasette</generator>
   <entry>
-    <id>atom-id</id>
-    <title>title</title>
+    <id>1</id>
+    <title>123</title>
     <updated>2019-10-23T21:32:12-07:00</updated>
     <content type="text">blah &lt;b&gt;Bold&lt;/b&gt;</content>
   </entry>
@@ -94,8 +94,8 @@ def test_incorrect_sql_returns_400():
 def test_atom_for_valid_query():
     sql = """
     select
-        'atom-id' as atom_id,
-        'title' as atom_title,
+        1 as atom_id,
+        123 as atom_title,
         '2019-10-23T21:32:12-07:00' as atom_updated,
         'blah <b>Bold</b>' as atom_content
     union select
