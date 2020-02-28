@@ -1,6 +1,8 @@
-from .utils import make_app_client
 import datasette
+from datasette.app import Datasette
 import urllib.parse
+import pytest
+import httpx
 
 EXPECTED_ATOM = """
 <?xml version='1.0' encoding='UTF-8'?>
@@ -84,14 +86,19 @@ EXPECTED_ATOM_WITH_HTML = """
 """.strip()
 
 
-def test_incorrect_sql_returns_400():
-    app = make_app_client()
-    response = app.get("/:memory:.atom?sql=select+sqlite_version()")
-    assert 400 == response.status
-    assert "SQL query must return columns" in response.text
+@pytest.mark.asyncio
+async def test_incorrect_sql_returns_400():
+    app = Datasette([], immutables=[], memory=True).app()
+    async with httpx.AsyncClient(app=app) as client:
+        response = await client.get(
+            "http://localhost/:memory:.atom?sql=select+sqlite_version()"
+        )
+    assert 400 == response.status_code
+    assert b"SQL query must return columns" in response.content
 
 
-def test_atom_for_valid_query():
+@pytest.mark.asyncio
+async def test_atom_for_valid_query():
     sql = """
     select
         1 as atom_id,
@@ -104,14 +111,21 @@ def test_atom_for_valid_query():
         '2019-09-23T21:32:12-07:00' as atom_updated,
         'blah' as atom_content;
     """
-    app = make_app_client()
-    response = app.get("/:memory:.atom?" + urllib.parse.urlencode({"sql": sql}))
-    assert 200 == response.status
+    app = Datasette([], immutables=[], memory=True).app()
+    async with httpx.AsyncClient(app=app) as client:
+        response = await client.get(
+            "http://localhost/:memory:.atom?" + urllib.parse.urlencode({"sql": sql})
+        )
+    assert 200 == response.status_code
     assert "application/xml; charset=utf-8" == response.headers["content-type"]
-    assert EXPECTED_ATOM.format(version=datasette.__version__) == response.text.strip()
+    assert (
+        EXPECTED_ATOM.format(version=datasette.__version__)
+        == response.content.decode("utf-8").strip()
+    )
 
 
-def test_atom_with_optional_link():
+@pytest.mark.asyncio
+async def test_atom_with_optional_link():
     sql = """
     select
         'atom-id' as atom_id,
@@ -120,17 +134,21 @@ def test_atom_with_optional_link():
         'https://www.niche-museums.com/' as atom_link,
         'blah' as atom_content;
     """
-    app = make_app_client()
-    response = app.get("/:memory:.atom?" + urllib.parse.urlencode({"sql": sql}))
-    assert 200 == response.status
+    app = Datasette([], immutables=[], memory=True).app()
+    async with httpx.AsyncClient(app=app) as client:
+        response = await client.get(
+            "http://localhost/:memory:.atom?" + urllib.parse.urlencode({"sql": sql})
+        )
+    assert 200 == response.status_code
     assert "application/xml; charset=utf-8" == response.headers["content-type"]
     assert (
         EXPECTED_ATOM_WITH_LINK.format(version=datasette.__version__)
-        == response.text.strip()
+        == response.content.decode("utf-8").strip()
     )
 
 
-def test_atom_with_bad_html():
+@pytest.mark.asyncio
+async def test_atom_with_bad_html():
     sql = """
     select
         'atom-id' as atom_id,
@@ -139,11 +157,14 @@ def test_atom_with_bad_html():
         'https://www.niche-museums.com/' as atom_link,
         '<h2>blah</h2><script>alert("bad")</script>' as atom_content_html;
     """
-    app = make_app_client()
-    response = app.get("/:memory:.atom?" + urllib.parse.urlencode({"sql": sql}))
-    assert 200 == response.status
+    app = Datasette([], immutables=[], memory=True).app()
+    async with httpx.AsyncClient(app=app) as client:
+        response = await client.get(
+            "http://localhost/:memory:.atom?" + urllib.parse.urlencode({"sql": sql})
+        )
+    assert 200 == response.status_code
     assert "application/xml; charset=utf-8" == response.headers["content-type"]
     assert (
         EXPECTED_ATOM_WITH_HTML.format(version=datasette.__version__)
-        == response.text.strip()
+        == response.content.decode("utf-8").strip()
     )
