@@ -57,7 +57,6 @@ def render_atom(args, data, view_name):
 
 
 def clean(html):
-    print("cleaning: ", html)
     cleaned = bleach.clean(
         html,
         tags=[
@@ -85,5 +84,4 @@ def clean(html):
         ],
         attributes={"a": ["href", "title"], "img": ["alt", "src"]},
     )
-    print("cleaned", cleaned)
     return cleaned
