@@ -49,6 +49,16 @@ def render_atom(args, data, view_name):
         # atom_link is optional
         if "atom_link" in columns:
             entry.link(href=row["atom_link"])
+        if "atom_author_name" in columns and row["atom_author_name"]:
+            author = {
+                "name": row["atom_author_name"],
+            }
+            for key in ("uri", "email"):
+                colname = "atom_author_{}".format(key)
+                if colname in columns and row[colname]:
+                    author[key] = row[colname]
+            entry.author(author)
+
     return {
         "body": fg.atom_str(pretty=True),
         "content_type": "application/xml; charset=utf-8",

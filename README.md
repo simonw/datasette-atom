@@ -25,6 +25,7 @@ The following columns are optional:
 * `atom_content` - content that should be shown in the feed. This will be treated as a regular string, so any embedded HTML tags will be escaped when they are displayed.
 * `atom_content_html` - content that should be shown in the feed. This will be treated as an HTML string, and will be sanitized using [Bleach](https://github.com/mozilla/bleach) to ensure it does not have any malicious code in it before being returned as part of a `<content type="html">` Atom element. If both are provided, this will be used in place of `atom_content`.
 * `atom_link` - a URL that should be used as the link that the feed entry points to.
+* `atom_author_name` - the name of the author of the entry. If you provide this you can also provide `atom_author_uri` and `atom_author_email` with a URL and e-mail address for that author.
 
 A query that returns these columns can then be returned as an Atom feed by adding the `.atom` extension.
 

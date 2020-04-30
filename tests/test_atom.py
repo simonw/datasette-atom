@@ -7,18 +7,22 @@ import httpx
 EXPECTED_ATOM = """
 <?xml version='1.0' encoding='UTF-8'?>
 <feed xmlns="http://www.w3.org/2005/Atom">
-  <id>:memory:/8bec181fc0b493a38da7c73d9c5e13331e3acfaceb300eeddf6847179edede7c</id>
+  <id>:memory:/d765251b024da6156f346354d5ca573b2c8717bc71d82d2e1a2fdd55b9a44215</id>
   <title>
     select
         1 as atom_id,
         123 as atom_title,
         '2019-10-23T21:32:12-07:00' as atom_updated,
-        'blah &lt;b&gt;Bold&lt;/b&gt;' as atom_content
+        'blah &lt;b&gt;Bold&lt;/b&gt;' as atom_content,
+        'Author' as atom_author_name,
+        'https://www.example.com/' as atom_author_uri
     union select
         'atom-id-2' as atom_id,
         'title 2' as atom_title,
         '2019-09-23T21:32:12-07:00' as atom_updated,
-        'blah' as atom_content;
+        'blah' as atom_content,
+        null as atom_author_name,
+        null as atom_author_uri;
     </title>
   <updated>2019-10-23T21:32:12-07:00</updated>
   <generator uri="https://github.com/simonw/datasette" version="{version}">Datasette</generator>
@@ -26,6 +30,10 @@ EXPECTED_ATOM = """
     <id>1</id>
     <title>123</title>
     <updated>2019-10-23T21:32:12-07:00</updated>
+    <author>
+      <name>Author</name>
+      <uri>https://www.example.com/</uri>
+    </author>
     <content type="text">blah &lt;b&gt;Bold&lt;/b&gt;</content>
   </entry>
   <entry>
@@ -104,12 +112,16 @@ async def test_atom_for_valid_query():
         1 as atom_id,
         123 as atom_title,
         '2019-10-23T21:32:12-07:00' as atom_updated,
-        'blah <b>Bold</b>' as atom_content
+        'blah <b>Bold</b>' as atom_content,
+        'Author' as atom_author_name,
+        'https://www.example.com/' as atom_author_uri
     union select
         'atom-id-2' as atom_id,
         'title 2' as atom_title,
         '2019-09-23T21:32:12-07:00' as atom_updated,
-        'blah' as atom_content;
+        'blah' as atom_content,
+        null as atom_author_name,
+        null as atom_author_uri;
     """
     app = Datasette([], immutables=[], memory=True).app()
     async with httpx.AsyncClient(app=app) as client:
