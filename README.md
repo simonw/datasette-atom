@@ -1,6 +1,7 @@
 # datasette-atom
 
 [![PyPI](https://img.shields.io/pypi/v/datasette-atom.svg)](https://pypi.org/project/datasette-atom/)
+[![Changelog](https://img.shields.io/github/v/release/simonw/datasette-atom?include_prereleases&label=changelog)](https://github.com/simonw/datasette-atom/releases)
 [![CircleCI](https://circleci.com/gh/simonw/datasette-atom.svg?style=svg)](https://circleci.com/gh/simonw/datasette-atom)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://github.com/simonw/datasette-atom/blob/master/LICENSE)
 
