@@ -12,10 +12,11 @@ def register_output_renderer():
     return {"extension": "atom", "render": render_atom, "can_render": can_render_atom}
 
 
-def render_atom(args, data, view_name):
+def render_atom(
+    datasette, request, sql, columns, rows, database, table, query_name, view_name, data
+):
     from datasette.views.base import DatasetteError
 
-    columns = set(data["columns"])
     if not REQUIRED_COLUMNS.issubset(columns):
         raise DatasetteError(
             "SQL query must return columns {}".format(", ".join(REQUIRED_COLUMNS)),
@@ -27,17 +28,25 @@ def render_atom(args, data, view_name):
         version=__version__,
         uri="https://github.com/simonw/datasette",
     )
-    sql = data["query"]["sql"]
-    fg.id(data["database"] + "/" + hashlib.sha256(sql.encode("utf8")).hexdigest())
-    fg.updated(max(row["atom_updated"] for row in data["rows"]))
-    title = args.get("_feed_title", sql)
-    if data.get("table"):
-        title += "/" + data["table"]
+    fg.id(request.url)
+    fg.link(href=request.url, rel="self")
+    fg.updated(max(row["atom_updated"] for row in rows))
+    title = request.args.get("_feed_title", sql)
+    if table:
+        title += "/" + table
     if data.get("human_description_en"):
         title += ": " + data["human_description_en"]
+    # If this is a canned query the configured title for that over-rides all others
+    if query_name:
+        try:
+            title = datasette.metadata(database=database)["queries"][query_name][
+                "title"
+            ]
+        except (KeyError, TypeError):
+            pass
     fg.title(title)
     # And the rows
-    for row in reversed(data["rows"]):
+    for row in reversed(rows):
         entry = fg.add_entry()
         entry.id(str(row["atom_id"]))
         if "atom_content_html" in columns:
@@ -67,7 +76,7 @@ def render_atom(args, data, view_name):
 
 
 def can_render_atom(columns):
-    return {"atom_id", "atom_title", "atom_updated"}.issubset(columns)
+    return REQUIRED_COLUMNS.issubset(columns)
 
 
 def clean(html):

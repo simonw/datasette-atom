@@ -53,3 +53,33 @@ limit
 ```
 
 You can try this query by [pasting it in here](https://www.niche-museums.com/browse) - then click the `.atom` link to see it as an Atom feed.
+
+## Using a canned query
+
+Datasette's [canned query mechanism](https://datasette.readthedocs.io/en/stable/sql_queries.html#canned-queries) is a useful way to configure feeds. If a canned query definition has a `title` that will be used as the title of the Atom feed.
+
+Here's an example, defined using a `metadata.yaml` file:
+
+```yaml
+databases:
+  browse:
+    queries:
+      feed:
+        title: Niche Museums
+        sql: |-
+          select
+            'tag:niche-museums.com,' || substr(created, 0, 11) || ':' || id as atom_id,
+            name as atom_title,
+            created as atom_updated,
+            'https://www.niche-museums.com/browse/museums/' || id as atom_link,
+            coalesce(
+              '<img src="' || photo_url || '?w=800&amp;h=400&amp;fit=crop&amp;auto=compress">',
+              ''
+            ) || '<p>' || description || '</p>' as atom_content_html
+          from
+            museums
+          order by
+            created desc
+          limit
+            15
+```

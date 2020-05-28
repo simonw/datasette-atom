@@ -7,7 +7,7 @@ import httpx
 EXPECTED_ATOM = """
 <?xml version='1.0' encoding='UTF-8'?>
 <feed xmlns="http://www.w3.org/2005/Atom">
-  <id>:memory:/d765251b024da6156f346354d5ca573b2c8717bc71d82d2e1a2fdd55b9a44215</id>
+  <id>http://localhost/:memory:.atom?sql=%0A++++select%0A++++++++1+as+atom_id%2C%0A++++++++123+as+atom_title%2C%0A++++++++%272019-10-23T21%3A32%3A12-07%3A00%27+as+atom_updated%2C%0A++++++++%27blah+%3Cb%3EBold%3C%2Fb%3E%27+as+atom_content%2C%0A++++++++%27Author%27+as+atom_author_name%2C%0A++++++++%27https%3A%2F%2Fwww.example.com%2F%27+as+atom_author_uri%0A++++union+select%0A++++++++%27atom-id-2%27+as+atom_id%2C%0A++++++++%27title+2%27+as+atom_title%2C%0A++++++++%272019-09-23T21%3A32%3A12-07%3A00%27+as+atom_updated%2C%0A++++++++%27blah%27+as+atom_content%2C%0A++++++++null+as+atom_author_name%2C%0A++++++++null+as+atom_author_uri%3B%0A++++</id>
   <title>
     select
         1 as atom_id,
@@ -25,6 +25,7 @@ EXPECTED_ATOM = """
         null as atom_author_uri;
     </title>
   <updated>2019-10-23T21:32:12-07:00</updated>
+  <link href="http://localhost/:memory:.atom?sql=%0A++++select%0A++++++++1+as+atom_id%2C%0A++++++++123+as+atom_title%2C%0A++++++++%272019-10-23T21%3A32%3A12-07%3A00%27+as+atom_updated%2C%0A++++++++%27blah+%3Cb%3EBold%3C%2Fb%3E%27+as+atom_content%2C%0A++++++++%27Author%27+as+atom_author_name%2C%0A++++++++%27https%3A%2F%2Fwww.example.com%2F%27+as+atom_author_uri%0A++++union+select%0A++++++++%27atom-id-2%27+as+atom_id%2C%0A++++++++%27title+2%27+as+atom_title%2C%0A++++++++%272019-09-23T21%3A32%3A12-07%3A00%27+as+atom_updated%2C%0A++++++++%27blah%27+as+atom_content%2C%0A++++++++null+as+atom_author_name%2C%0A++++++++null+as+atom_author_uri%3B%0A++++" rel="self"/>
   <generator uri="https://github.com/simonw/datasette" version="{version}">Datasette</generator>
   <entry>
     <id>1</id>
@@ -48,7 +49,7 @@ EXPECTED_ATOM = """
 EXPECTED_ATOM_WITH_LINK = """
 <?xml version='1.0' encoding='UTF-8'?>
 <feed xmlns="http://www.w3.org/2005/Atom">
-  <id>:memory:/652f6714d6b9efa3657b50fe0ae8cbac13ccefb2ecbdbafe527c6f6fe97556da</id>
+  <id>http://localhost/:memory:.atom?sql=%0A++++select%0A++++++++%27atom-id%27+as+atom_id%2C%0A++++++++%27title%27+as+atom_title%2C%0A++++++++%272019-10-23T21%3A32%3A12-07%3A00%27+as+atom_updated%2C%0A++++++++%27https%3A%2F%2Fwww.niche-museums.com%2F%27+as+atom_link%2C%0A++++++++%27blah%27+as+atom_content%3B%0A++++</id>
   <title>
     select
         'atom-id' as atom_id,
@@ -58,6 +59,7 @@ EXPECTED_ATOM_WITH_LINK = """
         'blah' as atom_content;
     </title>
   <updated>2019-10-23T21:32:12-07:00</updated>
+  <link href="http://localhost/:memory:.atom?sql=%0A++++select%0A++++++++%27atom-id%27+as+atom_id%2C%0A++++++++%27title%27+as+atom_title%2C%0A++++++++%272019-10-23T21%3A32%3A12-07%3A00%27+as+atom_updated%2C%0A++++++++%27https%3A%2F%2Fwww.niche-museums.com%2F%27+as+atom_link%2C%0A++++++++%27blah%27+as+atom_content%3B%0A++++" rel="self"/>
   <generator uri="https://github.com/simonw/datasette" version="{version}">Datasette</generator>
   <entry>
     <id>atom-id</id>
@@ -72,7 +74,7 @@ EXPECTED_ATOM_WITH_LINK = """
 EXPECTED_ATOM_WITH_HTML = """
 <?xml version='1.0' encoding='UTF-8'?>
 <feed xmlns="http://www.w3.org/2005/Atom">
-  <id>:memory:/beb5a312c0daa591d04d7dfb5a79eb8bbbcd6f84ebe90cf0345ed8c24bb2ff22</id>
+  <id>http://localhost/:memory:.atom?sql=%0A++++select%0A++++++++%27atom-id%27+as+atom_id%2C%0A++++++++%27title%27+as+atom_title%2C%0A++++++++%272019-10-23T21%3A32%3A12-07%3A00%27+as+atom_updated%2C%0A++++++++%27https%3A%2F%2Fwww.niche-museums.com%2F%27+as+atom_link%2C%0A++++++++%27%3Ch2%3Eblah%3C%2Fh2%3E%3Cscript%3Ealert%28%22bad%22%29%3C%2Fscript%3E%27+as+atom_content_html%3B%0A++++</id>
   <title>
     select
         'atom-id' as atom_id,
@@ -82,6 +84,7 @@ EXPECTED_ATOM_WITH_HTML = """
         '&lt;h2&gt;blah&lt;/h2&gt;&lt;script&gt;alert("bad")&lt;/script&gt;' as atom_content_html;
     </title>
   <updated>2019-10-23T21:32:12-07:00</updated>
+  <link href="http://localhost/:memory:.atom?sql=%0A++++select%0A++++++++%27atom-id%27+as+atom_id%2C%0A++++++++%27title%27+as+atom_title%2C%0A++++++++%272019-10-23T21%3A32%3A12-07%3A00%27+as+atom_updated%2C%0A++++++++%27https%3A%2F%2Fwww.niche-museums.com%2F%27+as+atom_link%2C%0A++++++++%27%3Ch2%3Eblah%3C%2Fh2%3E%3Cscript%3Ealert%28%22bad%22%29%3C%2Fscript%3E%27+as+atom_content_html%3B%0A++++" rel="self"/>
   <generator uri="https://github.com/simonw/datasette" version="{version}">Datasette</generator>
   <entry>
     <id>atom-id</id>
@@ -208,3 +211,31 @@ async def test_atom_link_only_shown_for_correct_queries():
         )
     assert b'<a href="/:memory:.json' in response.content
     assert b'<a href="/:memory:.atom' not in response.content
+
+
+@pytest.mark.asyncio
+async def test_atom_from_titled_canned_query():
+    sql = """
+    select
+        'atom-id' as atom_id,
+        'title' as atom_title,
+        '2019-10-23T21:32:12-07:00' as atom_updated,
+        'https://www.niche-museums.com/' as atom_link,
+        'blah' as atom_content;
+    """
+    app = Datasette(
+        [],
+        immutables=[],
+        memory=True,
+        metadata={
+            "databases": {
+                ":memory:": {"queries": {"feed": {"sql": sql, "title": "My atom feed"}}}
+            }
+        },
+    ).app()
+    async with httpx.AsyncClient(app=app) as client:
+        response = await client.get("http://localhost/:memory:/feed.atom")
+    assert 200 == response.status_code
+    assert "application/xml; charset=utf-8" == response.headers["content-type"]
+    xml = response.content.decode("utf-8")
+    assert "<title>My atom feed</title>" in xml
