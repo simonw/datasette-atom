@@ -203,7 +203,8 @@ async def test_atom_link_only_shown_for_correct_queries():
     # But with a different query that link is not shown:
     async with httpx.AsyncClient(app=app) as client:
         response = await client.get(
-            "http://localhost/:memory:?" + urllib.parse.urlencode({"sql": "select sqlite_version()"})
+            "http://localhost/:memory:?"
+            + urllib.parse.urlencode({"sql": "select sqlite_version()"})
         )
     assert b'<a href="/:memory:.json' in response.content
     assert b'<a href="/:memory:.atom' not in response.content
