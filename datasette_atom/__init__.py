@@ -9,7 +9,7 @@ REQUIRED_COLUMNS = {"atom_id", "atom_updated", "atom_title"}
 
 @hookimpl
 def register_output_renderer():
-    return {"extension": "atom", "callback": render_atom}
+    return {"extension": "atom", "render": render_atom, "can_render": can_render_atom}
 
 
 def render_atom(args, data, view_name):
@@ -64,6 +64,10 @@ def render_atom(args, data, view_name):
         "content_type": "application/xml; charset=utf-8",
         "status_code": 200,
     }
+
+
+def can_render_atom(columns):
+    return {"atom_id", "atom_title", "atom_updated"}.issubset(columns)
 
 
 def clean(html):
