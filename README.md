@@ -83,3 +83,36 @@ databases:
           limit
             15
 ```
+## Disabling HTML filtering
+
+The HTML allow-list used by Bleach for the `atom_content_html` column can be found in the `clean(html)` function at the bottom of [datasette_atom/__init__.py](https://github.com/simonw/datasette-atom/blob/main/datasette_atom/__init__.py).
+
+You can disable Bleach entirely for Atom feeds generated using a canned query. You should only do this if you are certain that no user-provided HTML could be included in that value.
+
+Here's how to do that in `metadata.json`:
+
+```json
+{
+  "plugins": {
+    "datasette-atom": {
+      "allow_unsafe_html_in_canned_queries": true
+    }
+  }
+}
+```
+Setting this to `true` will disable Bleach filtering for all canned queries across all databases.
+
+You can disable Bleach filtering just for a specific list of canned queries like so:
+
+```json
+{
+  "plugins": {
+    "datasette-atom": {
+      "allow_unsafe_html_in_canned_queries": {
+        "museums": ["latest", "moderation"]
+      }
+    }
+  }
+}
+```
+This will disable Bleach just for the canned queries called `latest` and `moderation` in the `museums.db` database.

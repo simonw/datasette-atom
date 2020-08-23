@@ -239,3 +239,43 @@ async def test_atom_from_titled_canned_query():
     assert "application/xml; charset=utf-8" == response.headers["content-type"]
     xml = response.content.decode("utf-8")
     assert "<title>My atom feed</title>" in xml
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "config,should_allow",
+    [
+        (True, True),
+        (False, False),
+        ({":memory:": ["latest"]}, True),
+        ({":memory:": ["notlatest"]}, False),
+    ],
+)
+async def test_allow_unsafe_html_in_canned_queries(config, should_allow):
+    sql = """
+    select
+        'atom-id' as atom_id,
+        'title' as atom_title,
+        '2019-10-23T21:32:12-07:00' as atom_updated,
+        'https://www.niche-museums.com/' as atom_link,
+        '<iframe>An iframe!</iframe>' as atom_content_html;
+    """
+    metadata = {
+        "databases": {":memory:": {"queries": {"latest": {"sql": sql}}},},
+        "plugins": {"datasette-atom": {"allow_unsafe_html_in_canned_queries": config}},
+    }
+    app = Datasette([], immutables=[], memory=True, metadata=metadata,).app()
+    async with httpx.AsyncClient(app=app) as client:
+        response = await client.get("http://localhost/:memory:/latest.atom")
+    assert 200 == response.status_code
+    assert "application/xml; charset=utf-8" == response.headers["content-type"]
+    if should_allow:
+        assert (
+            '<content type="html">&lt;iframe&gt;An iframe!&lt;/iframe&gt;</content>'
+            in response.text
+        )
+    else:
+        assert (
+            '<content type="html">&amp;lt;iframe&amp;gt;An iframe!&amp;lt;/iframe&amp;gt;</content>'
+            in response.text
+        )

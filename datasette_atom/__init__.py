@@ -45,12 +45,32 @@ def render_atom(
         except (KeyError, TypeError):
             pass
     fg.title(title)
+
+    clean_function = clean
+    if query_name:
+        # Check allow_unsafe_html_in_canned_queries
+        plugin_config = datasette.plugin_config("datasette-atom")
+        if plugin_config:
+            allow_unsafe_html_in_canned_queries = plugin_config.get(
+                "allow_unsafe_html_in_canned_queries"
+            )
+            print(
+                "allow_unsafe_html_in_canned_queries",
+                allow_unsafe_html_in_canned_queries,
+            )
+            if allow_unsafe_html_in_canned_queries is True:
+                clean_function = lambda s: s
+            elif isinstance(allow_unsafe_html_in_canned_queries, dict):
+                allowlist = allow_unsafe_html_in_canned_queries.get(database) or []
+                if query_name in allowlist:
+                    clean_function = lambda s: s
+
     # And the rows
     for row in reversed(rows):
         entry = fg.add_entry()
         entry.id(str(row["atom_id"]))
         if "atom_content_html" in columns:
-            entry.content(clean(row["atom_content_html"]), type="html")
+            entry.content(clean_function(row["atom_content_html"]), type="html")
         elif "atom_content" in columns:
             entry.content(row["atom_content"], type="text")
         entry.updated(row["atom_updated"])
