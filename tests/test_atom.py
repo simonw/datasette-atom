@@ -261,10 +261,17 @@ async def test_allow_unsafe_html_in_canned_queries(config, should_allow):
         '<iframe>An iframe!</iframe>' as atom_content_html;
     """
     metadata = {
-        "databases": {":memory:": {"queries": {"latest": {"sql": sql}}},},
+        "databases": {
+            ":memory:": {"queries": {"latest": {"sql": sql}}},
+        },
         "plugins": {"datasette-atom": {"allow_unsafe_html_in_canned_queries": config}},
     }
-    app = Datasette([], immutables=[], memory=True, metadata=metadata,).app()
+    app = Datasette(
+        [],
+        immutables=[],
+        memory=True,
+        metadata=metadata,
+    ).app()
     async with httpx.AsyncClient(app=app) as client:
         response = await client.get("http://localhost/:memory:/latest.atom")
     assert 200 == response.status_code
