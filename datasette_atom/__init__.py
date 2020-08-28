@@ -1,5 +1,6 @@
 import bleach
 from datasette import hookimpl, __version__
+from datasette.utils.asgi import Response
 from feedgen.feed import FeedGenerator
 import hashlib
 import html
@@ -88,11 +89,11 @@ def render_atom(
                     author[key] = row[colname]
             entry.author(author)
 
-    return {
-        "body": fg.atom_str(pretty=True),
-        "content_type": "application/xml; charset=utf-8",
-        "status_code": 200,
-    }
+    return Response(
+        fg.atom_str(pretty=True),
+        content_type="application/xml; charset=utf-8",
+        status=200,
+    )
 
 
 def can_render_atom(columns):

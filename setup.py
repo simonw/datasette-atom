@@ -23,7 +23,7 @@ setup(
     version=VERSION,
     packages=["datasette_atom"],
     entry_points={"datasette": ["atom = datasette_atom"]},
-    install_requires=["datasette>=0.46", "feedgen", "bleach"],
+    install_requires=["datasette>=0.49a0", "feedgen", "bleach"],
     extras_require={"test": ["pytest", "pytest-asyncio", "httpx"]},
     tests_require=["datasette-atom[test]"],
 )
