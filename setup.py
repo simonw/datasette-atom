@@ -1,7 +1,7 @@
 from setuptools import setup
 import os
 
-VERSION = "0.7"
+VERSION = "0.8"
 
 
 def get_long_description():
@@ -23,7 +23,7 @@ setup(
     version=VERSION,
     packages=["datasette_atom"],
     entry_points={"datasette": ["atom = datasette_atom"]},
-    install_requires=["datasette>=0.49a0", "feedgen", "bleach"],
+    install_requires=["datasette>=0.49", "feedgen", "bleach"],
     extras_require={"test": ["pytest", "pytest-asyncio", "httpx"]},
     tests_require=["datasette-atom[test]"],
 )
