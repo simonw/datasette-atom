@@ -55,10 +55,6 @@ def render_atom(
             allow_unsafe_html_in_canned_queries = plugin_config.get(
                 "allow_unsafe_html_in_canned_queries"
             )
-            print(
-                "allow_unsafe_html_in_canned_queries",
-                allow_unsafe_html_in_canned_queries,
-            )
             if allow_unsafe_html_in_canned_queries is True:
                 clean_function = lambda s: s
             elif isinstance(allow_unsafe_html_in_canned_queries, dict):
