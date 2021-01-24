@@ -56,7 +56,7 @@ You can try this query by [pasting it in here](https://www.niche-museums.com/bro
 
 ## Using a canned query
 
-Datasette's [canned query mechanism](https://datasette.readthedocs.io/en/stable/sql_queries.html#canned-queries) is a useful way to configure feeds. If a canned query definition has a `title` that will be used as the title of the Atom feed.
+Datasette's [canned query mechanism](https://docs.datasette.io/en/stable/sql_queries.html#canned-queries) is a useful way to configure feeds. If a canned query definition has a `title` that will be used as the title of the Atom feed.
 
 Here's an example, defined using a `metadata.yaml` file:
 
