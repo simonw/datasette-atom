@@ -2,12 +2,11 @@ import datasette
 from datasette.app import Datasette
 import urllib.parse
 import pytest
-import httpx
 
 EXPECTED_ATOM = """
 <?xml version='1.0' encoding='UTF-8'?>
 <feed xmlns="http://www.w3.org/2005/Atom">
-  <id>http://localhost/:memory:.atom?sql=%0A++++select%0A++++++++1+as+atom_id%2C%0A++++++++123+as+atom_title%2C%0A++++++++%272019-10-23T21%3A32%3A12-07%3A00%27+as+atom_updated%2C%0A++++++++%27blah+%3Cb%3EBold%3C%2Fb%3E%27+as+atom_content%2C%0A++++++++%27Author%27+as+atom_author_name%2C%0A++++++++%27https%3A%2F%2Fwww.example.com%2F%27+as+atom_author_uri%0A++++union+select%0A++++++++%27atom-id-2%27+as+atom_id%2C%0A++++++++%27title+2%27+as+atom_title%2C%0A++++++++%272019-09-23T21%3A32%3A12-07%3A00%27+as+atom_updated%2C%0A++++++++%27blah%27+as+atom_content%2C%0A++++++++null+as+atom_author_name%2C%0A++++++++null+as+atom_author_uri%3B%0A++++</id>
+  <id>http://localhost/_memory.atom?sql=%0A++++select%0A++++++++1+as+atom_id%2C%0A++++++++123+as+atom_title%2C%0A++++++++%272019-10-23T21%3A32%3A12-07%3A00%27+as+atom_updated%2C%0A++++++++%27blah+%3Cb%3EBold%3C%2Fb%3E%27+as+atom_content%2C%0A++++++++%27Author%27+as+atom_author_name%2C%0A++++++++%27https%3A%2F%2Fwww.example.com%2F%27+as+atom_author_uri%0A++++union+select%0A++++++++%27atom-id-2%27+as+atom_id%2C%0A++++++++%27title+2%27+as+atom_title%2C%0A++++++++%272019-09-23T21%3A32%3A12-07%3A00%27+as+atom_updated%2C%0A++++++++%27blah%27+as+atom_content%2C%0A++++++++null+as+atom_author_name%2C%0A++++++++null+as+atom_author_uri%3B%0A++++</id>
   <title>
     select
         1 as atom_id,
@@ -25,7 +24,7 @@ EXPECTED_ATOM = """
         null as atom_author_uri;
     </title>
   <updated>2019-10-23T21:32:12-07:00</updated>
-  <link href="http://localhost/:memory:.atom?sql=%0A++++select%0A++++++++1+as+atom_id%2C%0A++++++++123+as+atom_title%2C%0A++++++++%272019-10-23T21%3A32%3A12-07%3A00%27+as+atom_updated%2C%0A++++++++%27blah+%3Cb%3EBold%3C%2Fb%3E%27+as+atom_content%2C%0A++++++++%27Author%27+as+atom_author_name%2C%0A++++++++%27https%3A%2F%2Fwww.example.com%2F%27+as+atom_author_uri%0A++++union+select%0A++++++++%27atom-id-2%27+as+atom_id%2C%0A++++++++%27title+2%27+as+atom_title%2C%0A++++++++%272019-09-23T21%3A32%3A12-07%3A00%27+as+atom_updated%2C%0A++++++++%27blah%27+as+atom_content%2C%0A++++++++null+as+atom_author_name%2C%0A++++++++null+as+atom_author_uri%3B%0A++++" rel="self"/>
+  <link href="http://localhost/_memory.atom?sql=%0A++++select%0A++++++++1+as+atom_id%2C%0A++++++++123+as+atom_title%2C%0A++++++++%272019-10-23T21%3A32%3A12-07%3A00%27+as+atom_updated%2C%0A++++++++%27blah+%3Cb%3EBold%3C%2Fb%3E%27+as+atom_content%2C%0A++++++++%27Author%27+as+atom_author_name%2C%0A++++++++%27https%3A%2F%2Fwww.example.com%2F%27+as+atom_author_uri%0A++++union+select%0A++++++++%27atom-id-2%27+as+atom_id%2C%0A++++++++%27title+2%27+as+atom_title%2C%0A++++++++%272019-09-23T21%3A32%3A12-07%3A00%27+as+atom_updated%2C%0A++++++++%27blah%27+as+atom_content%2C%0A++++++++null+as+atom_author_name%2C%0A++++++++null+as+atom_author_uri%3B%0A++++" rel="self"/>
   <generator uri="https://github.com/simonw/datasette" version="{version}">Datasette</generator>
   <entry>
     <id>1</id>
@@ -49,7 +48,7 @@ EXPECTED_ATOM = """
 EXPECTED_ATOM_WITH_LINK = """
 <?xml version='1.0' encoding='UTF-8'?>
 <feed xmlns="http://www.w3.org/2005/Atom">
-  <id>http://localhost/:memory:.atom?sql=%0A++++select%0A++++++++%27atom-id%27+as+atom_id%2C%0A++++++++%27title%27+as+atom_title%2C%0A++++++++%272019-10-23T21%3A32%3A12-07%3A00%27+as+atom_updated%2C%0A++++++++%27https%3A%2F%2Fwww.niche-museums.com%2F%27+as+atom_link%2C%0A++++++++%27blah%27+as+atom_content%3B%0A++++</id>
+  <id>http://localhost/_memory.atom?sql=%0A++++select%0A++++++++%27atom-id%27+as+atom_id%2C%0A++++++++%27title%27+as+atom_title%2C%0A++++++++%272019-10-23T21%3A32%3A12-07%3A00%27+as+atom_updated%2C%0A++++++++%27https%3A%2F%2Fwww.niche-museums.com%2F%27+as+atom_link%2C%0A++++++++%27blah%27+as+atom_content%3B%0A++++</id>
   <title>
     select
         'atom-id' as atom_id,
@@ -59,7 +58,7 @@ EXPECTED_ATOM_WITH_LINK = """
         'blah' as atom_content;
     </title>
   <updated>2019-10-23T21:32:12-07:00</updated>
-  <link href="http://localhost/:memory:.atom?sql=%0A++++select%0A++++++++%27atom-id%27+as+atom_id%2C%0A++++++++%27title%27+as+atom_title%2C%0A++++++++%272019-10-23T21%3A32%3A12-07%3A00%27+as+atom_updated%2C%0A++++++++%27https%3A%2F%2Fwww.niche-museums.com%2F%27+as+atom_link%2C%0A++++++++%27blah%27+as+atom_content%3B%0A++++" rel="self"/>
+  <link href="http://localhost/_memory.atom?sql=%0A++++select%0A++++++++%27atom-id%27+as+atom_id%2C%0A++++++++%27title%27+as+atom_title%2C%0A++++++++%272019-10-23T21%3A32%3A12-07%3A00%27+as+atom_updated%2C%0A++++++++%27https%3A%2F%2Fwww.niche-museums.com%2F%27+as+atom_link%2C%0A++++++++%27blah%27+as+atom_content%3B%0A++++" rel="self"/>
   <generator uri="https://github.com/simonw/datasette" version="{version}">Datasette</generator>
   <entry>
     <id>atom-id</id>
@@ -74,7 +73,7 @@ EXPECTED_ATOM_WITH_LINK = """
 EXPECTED_ATOM_WITH_HTML = """
 <?xml version='1.0' encoding='UTF-8'?>
 <feed xmlns="http://www.w3.org/2005/Atom">
-  <id>http://localhost/:memory:.atom?sql=%0A++++select%0A++++++++%27atom-id%27+as+atom_id%2C%0A++++++++%27title%27+as+atom_title%2C%0A++++++++%272019-10-23T21%3A32%3A12-07%3A00%27+as+atom_updated%2C%0A++++++++%27https%3A%2F%2Fwww.niche-museums.com%2F%27+as+atom_link%2C%0A++++++++%27%3Ch2%3Eblah%3C%2Fh2%3E%3Cscript%3Ealert%28%22bad%22%29%3C%2Fscript%3E%27+as+atom_content_html%3B%0A++++</id>
+  <id>http://localhost/_memory.atom?sql=%0A++++select%0A++++++++%27atom-id%27+as+atom_id%2C%0A++++++++%27title%27+as+atom_title%2C%0A++++++++%272019-10-23T21%3A32%3A12-07%3A00%27+as+atom_updated%2C%0A++++++++%27https%3A%2F%2Fwww.niche-museums.com%2F%27+as+atom_link%2C%0A++++++++%27%3Ch2%3Eblah%3C%2Fh2%3E%3Cscript%3Ealert%28%22bad%22%29%3C%2Fscript%3E%27+as+atom_content_html%3B%0A++++</id>
   <title>
     select
         'atom-id' as atom_id,
@@ -84,7 +83,7 @@ EXPECTED_ATOM_WITH_HTML = """
         '&lt;h2&gt;blah&lt;/h2&gt;&lt;script&gt;alert("bad")&lt;/script&gt;' as atom_content_html;
     </title>
   <updated>2019-10-23T21:32:12-07:00</updated>
-  <link href="http://localhost/:memory:.atom?sql=%0A++++select%0A++++++++%27atom-id%27+as+atom_id%2C%0A++++++++%27title%27+as+atom_title%2C%0A++++++++%272019-10-23T21%3A32%3A12-07%3A00%27+as+atom_updated%2C%0A++++++++%27https%3A%2F%2Fwww.niche-museums.com%2F%27+as+atom_link%2C%0A++++++++%27%3Ch2%3Eblah%3C%2Fh2%3E%3Cscript%3Ealert%28%22bad%22%29%3C%2Fscript%3E%27+as+atom_content_html%3B%0A++++" rel="self"/>
+  <link href="http://localhost/_memory.atom?sql=%0A++++select%0A++++++++%27atom-id%27+as+atom_id%2C%0A++++++++%27title%27+as+atom_title%2C%0A++++++++%272019-10-23T21%3A32%3A12-07%3A00%27+as+atom_updated%2C%0A++++++++%27https%3A%2F%2Fwww.niche-museums.com%2F%27+as+atom_link%2C%0A++++++++%27%3Ch2%3Eblah%3C%2Fh2%3E%3Cscript%3Ealert%28%22bad%22%29%3C%2Fscript%3E%27+as+atom_content_html%3B%0A++++" rel="self"/>
   <generator uri="https://github.com/simonw/datasette" version="{version}">Datasette</generator>
   <entry>
     <id>atom-id</id>
@@ -99,11 +98,8 @@ EXPECTED_ATOM_WITH_HTML = """
 
 @pytest.mark.asyncio
 async def test_incorrect_sql_returns_400():
-    app = Datasette([], immutables=[], memory=True).app()
-    async with httpx.AsyncClient(app=app) as client:
-        response = await client.get(
-            "http://localhost/:memory:.atom?sql=select+sqlite_version()"
-        )
+    ds = Datasette(immutables=[], memory=True)
+    response = await ds.client.get("/_memory.atom?sql=select+sqlite_version()")
     assert 400 == response.status_code
     assert b"SQL query must return columns" in response.content
 
@@ -126,11 +122,8 @@ async def test_atom_for_valid_query():
         null as atom_author_name,
         null as atom_author_uri;
     """
-    app = Datasette([], immutables=[], memory=True).app()
-    async with httpx.AsyncClient(app=app) as client:
-        response = await client.get(
-            "http://localhost/:memory:.atom?" + urllib.parse.urlencode({"sql": sql})
-        )
+    ds = Datasette(memory=True)
+    response = await ds.client.get("/_memory.atom", params={"sql": sql})
     assert 200 == response.status_code
     assert "application/xml; charset=utf-8" == response.headers["content-type"]
     assert (
@@ -149,11 +142,8 @@ async def test_atom_with_optional_link():
         'https://www.niche-museums.com/' as atom_link,
         'blah' as atom_content;
     """
-    app = Datasette([], immutables=[], memory=True).app()
-    async with httpx.AsyncClient(app=app) as client:
-        response = await client.get(
-            "http://localhost/:memory:.atom?" + urllib.parse.urlencode({"sql": sql})
-        )
+    ds = Datasette(memory=True)
+    response = await ds.client.get("/_memory.atom", params={"sql": sql})
     assert 200 == response.status_code
     assert "application/xml; charset=utf-8" == response.headers["content-type"]
     assert (
@@ -172,11 +162,8 @@ async def test_atom_with_bad_html():
         'https://www.niche-museums.com/' as atom_link,
         '<h2>blah</h2><script>alert("bad")</script>' as atom_content_html;
     """
-    app = Datasette([], immutables=[], memory=True).app()
-    async with httpx.AsyncClient(app=app) as client:
-        response = await client.get(
-            "http://localhost/:memory:.atom?" + urllib.parse.urlencode({"sql": sql})
-        )
+    ds = Datasette(memory=True)
+    response = await ds.client.get("/_memory.atom", params={"sql": sql})
     assert 200 == response.status_code
     assert "application/xml; charset=utf-8" == response.headers["content-type"]
     assert (
@@ -195,22 +182,17 @@ async def test_atom_link_only_shown_for_correct_queries():
         'https://www.niche-museums.com/' as atom_link,
         '<h2>blah</h2><script>alert("bad")</script>' as atom_content_html;
     """
-    app = Datasette([], immutables=[], memory=True).app()
-    async with httpx.AsyncClient(app=app) as client:
-        response = await client.get(
-            "http://localhost/:memory:?" + urllib.parse.urlencode({"sql": sql})
-        )
+    ds = Datasette(memory=True)
+    response = await ds.client.get("/_memory", params={"sql": sql})
     assert 200 == response.status_code
     assert "text/html; charset=utf-8" == response.headers["content-type"]
-    assert b'<a href="/:memory:.atom' in response.content
+    assert '<a href="/_memory.atom' in response.text
     # But with a different query that link is not shown:
-    async with httpx.AsyncClient(app=app) as client:
-        response = await client.get(
-            "http://localhost/:memory:?"
-            + urllib.parse.urlencode({"sql": "select sqlite_version()"})
-        )
-    assert b'<a href="/:memory:.json' in response.content
-    assert b'<a href="/:memory:.atom' not in response.content
+    response = await ds.client.get(
+        "/_memory", params={"sql": "select sqlite_version()"}
+    )
+    assert '<a href="/_memory.json' in response.text
+    assert '<a href="/_memory.atom' not in response.text
 
 
 @pytest.mark.asyncio
@@ -223,18 +205,15 @@ async def test_atom_from_titled_canned_query():
         'https://www.niche-museums.com/' as atom_link,
         'blah' as atom_content;
     """
-    app = Datasette(
-        [],
-        immutables=[],
+    ds = Datasette(
         memory=True,
         metadata={
             "databases": {
-                ":memory:": {"queries": {"feed": {"sql": sql, "title": "My atom feed"}}}
+                "_memory": {"queries": {"feed": {"sql": sql, "title": "My atom feed"}}}
             }
         },
-    ).app()
-    async with httpx.AsyncClient(app=app) as client:
-        response = await client.get("http://localhost/:memory:/feed.atom")
+    )
+    response = await ds.client.get("/_memory/feed.atom")
     assert 200 == response.status_code
     assert "application/xml; charset=utf-8" == response.headers["content-type"]
     xml = response.content.decode("utf-8")
@@ -247,8 +226,8 @@ async def test_atom_from_titled_canned_query():
     [
         (True, True),
         (False, False),
-        ({":memory:": ["latest"]}, True),
-        ({":memory:": ["notlatest"]}, False),
+        ({"_memory": ["latest"]}, True),
+        ({"_memory": ["notlatest"]}, False),
     ],
 )
 async def test_allow_unsafe_html_in_canned_queries(config, should_allow):
@@ -262,18 +241,15 @@ async def test_allow_unsafe_html_in_canned_queries(config, should_allow):
     """
     metadata = {
         "databases": {
-            ":memory:": {"queries": {"latest": {"sql": sql}}},
+            "_memory": {"queries": {"latest": {"sql": sql}}},
         },
         "plugins": {"datasette-atom": {"allow_unsafe_html_in_canned_queries": config}},
     }
-    app = Datasette(
-        [],
-        immutables=[],
+    ds = Datasette(
         memory=True,
         metadata=metadata,
-    ).app()
-    async with httpx.AsyncClient(app=app) as client:
-        response = await client.get("http://localhost/:memory:/latest.atom")
+    )
+    response = await ds.client.get("/_memory/latest.atom")
     assert 200 == response.status_code
     assert "application/xml; charset=utf-8" == response.headers["content-type"]
     if should_allow:
