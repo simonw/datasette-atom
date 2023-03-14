@@ -105,6 +105,7 @@ def clean(html):
             "acronym",
             "b",
             "blockquote",
+            "br",
             "code",
             "em",
             "i",

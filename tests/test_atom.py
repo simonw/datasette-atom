@@ -73,23 +73,23 @@ EXPECTED_ATOM_WITH_LINK = """
 EXPECTED_ATOM_WITH_HTML = """
 <?xml version='1.0' encoding='UTF-8'?>
 <feed xmlns="http://www.w3.org/2005/Atom">
-  <id>http://localhost/_memory.atom?sql=%0A++++select%0A++++++++%27atom-id%27+as+atom_id%2C%0A++++++++%27title%27+as+atom_title%2C%0A++++++++%272019-10-23T21%3A32%3A12-07%3A00%27+as+atom_updated%2C%0A++++++++%27https%3A%2F%2Fwww.niche-museums.com%2F%27+as+atom_link%2C%0A++++++++%27%3Ch2%3Eblah%3C%2Fh2%3E%3Cscript%3Ealert%28%22bad%22%29%3C%2Fscript%3E%27+as+atom_content_html%3B%0A++++</id>
+  <id>http://localhost/_memory.atom?sql=%0A++++select%0A++++++++%27atom-id%27+as+atom_id%2C%0A++++++++%27title%27+as+atom_title%2C%0A++++++++%272019-10-23T21%3A32%3A12-07%3A00%27+as+atom_updated%2C%0A++++++++%27https%3A%2F%2Fwww.niche-museums.com%2F%27+as+atom_link%2C%0A++++++++%27%3Ch2%3Eblah%3C%2Fh2%3E%3Cbr%3E%3Cscript%3Ealert%28%22bad%22%29%3C%2Fscript%3E%27+as+atom_content_html%3B%0A++++</id>
   <title>
     select
         'atom-id' as atom_id,
         'title' as atom_title,
         '2019-10-23T21:32:12-07:00' as atom_updated,
         'https://www.niche-museums.com/' as atom_link,
-        '&lt;h2&gt;blah&lt;/h2&gt;&lt;script&gt;alert("bad")&lt;/script&gt;' as atom_content_html;
+        '&lt;h2&gt;blah&lt;/h2&gt;&lt;br&gt;&lt;script&gt;alert("bad")&lt;/script&gt;' as atom_content_html;
     </title>
   <updated>2019-10-23T21:32:12-07:00</updated>
-  <link href="http://localhost/_memory.atom?sql=%0A++++select%0A++++++++%27atom-id%27+as+atom_id%2C%0A++++++++%27title%27+as+atom_title%2C%0A++++++++%272019-10-23T21%3A32%3A12-07%3A00%27+as+atom_updated%2C%0A++++++++%27https%3A%2F%2Fwww.niche-museums.com%2F%27+as+atom_link%2C%0A++++++++%27%3Ch2%3Eblah%3C%2Fh2%3E%3Cscript%3Ealert%28%22bad%22%29%3C%2Fscript%3E%27+as+atom_content_html%3B%0A++++" rel="self"/>
+  <link href="http://localhost/_memory.atom?sql=%0A++++select%0A++++++++%27atom-id%27+as+atom_id%2C%0A++++++++%27title%27+as+atom_title%2C%0A++++++++%272019-10-23T21%3A32%3A12-07%3A00%27+as+atom_updated%2C%0A++++++++%27https%3A%2F%2Fwww.niche-museums.com%2F%27+as+atom_link%2C%0A++++++++%27%3Ch2%3Eblah%3C%2Fh2%3E%3Cbr%3E%3Cscript%3Ealert%28%22bad%22%29%3C%2Fscript%3E%27+as+atom_content_html%3B%0A++++" rel="self"/>
   <generator uri="https://github.com/simonw/datasette" version="{version}">Datasette</generator>
   <entry>
     <id>atom-id</id>
     <title>title</title>
     <updated>2019-10-23T21:32:12-07:00</updated>
-    <content type="html">&lt;h2&gt;blah&lt;/h2&gt;&amp;lt;script&amp;gt;alert("bad")&amp;lt;/script&amp;gt;</content>
+    <content type="html">&lt;h2&gt;blah&lt;/h2&gt;&lt;br&gt;&amp;lt;script&amp;gt;alert("bad")&amp;lt;/script&amp;gt;</content>
     <link href="https://www.niche-museums.com/" rel="alternate"/>
   </entry>
 </feed>
@@ -160,7 +160,7 @@ async def test_atom_with_bad_html():
         'title' as atom_title,
         '2019-10-23T21:32:12-07:00' as atom_updated,
         'https://www.niche-museums.com/' as atom_link,
-        '<h2>blah</h2><script>alert("bad")</script>' as atom_content_html;
+        '<h2>blah</h2><br><script>alert("bad")</script>' as atom_content_html;
     """
     ds = Datasette(memory=True)
     response = await ds.client.get("/_memory.atom", params={"sql": sql})
@@ -180,7 +180,7 @@ async def test_atom_link_only_shown_for_correct_queries():
         'title' as atom_title,
         '2019-10-23T21:32:12-07:00' as atom_updated,
         'https://www.niche-museums.com/' as atom_link,
-        '<h2>blah</h2><script>alert("bad")</script>' as atom_content_html;
+        '<h2>blah</h2><br><script>alert("bad")</script>' as atom_content_html;
     """
     ds = Datasette(memory=True)
     response = await ds.client.get("/_memory", params={"sql": sql})
