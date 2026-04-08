@@ -1,6 +1,6 @@
 [project]
 name = "datasette-atom"
-version = "0.9"
+version = "0.10a0"
 description = "Datasette plugin that adds a .atom output format"
 readme = "README.md"
 requires-python = ">=3.10"
