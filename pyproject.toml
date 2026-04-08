@@ -1,0 +1,36 @@
+[project]
+name = "datasette-atom"
+version = "0.9"
+description = "Datasette plugin that adds a .atom output format"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "Apache-2.0"
+authors = [{name = "Simon Willison"}]
+dependencies = [
+    "datasette>=1.0a20",
+    "feedgen",
+    "bleach",
+]
+
+[project.urls]
+Homepage = "https://github.com/simonw/datasette-atom"
+Issues = "https://github.com/simonw/datasette-atom/issues"
+CI = "https://github.com/simonw/datasette-atom/actions"
+Changelog = "https://github.com/simonw/datasette-atom/releases"
+
+[project.entry-points.datasette]
+atom = "datasette_atom"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0",
+    "pytest-asyncio",
+    "httpx",
+]
+
+[build-system]
+requires = ["uv_build>=0.9.18,<0.12.0"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-root = ""
