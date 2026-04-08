@@ -13,7 +13,7 @@ def register_output_renderer():
     return {"extension": "atom", "render": render_atom, "can_render": can_render_atom}
 
 
-def render_atom(
+async def render_atom(
     datasette, request, sql, columns, rows, database, table, query_name, view_name, data
 ):
     from datasette.views.base import DatasetteError
@@ -40,9 +40,11 @@ def render_atom(
     # If this is a canned query the configured title for that over-rides all others
     if query_name:
         try:
-            title = datasette.metadata(database=database)["queries"][query_name][
-                "title"
-            ]
+            query_info = await datasette.get_canned_query(
+                database, query_name, request.actor
+            )
+            if query_info and "title" in query_info:
+                title = query_info["title"]
         except (KeyError, TypeError):
             pass
     fg.title(title)
