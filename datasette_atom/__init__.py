@@ -39,14 +39,9 @@ async def render_atom(
         title += ": " + data["human_description_en"]
     # If this is a canned query the configured title for that over-rides all others
     if query_name:
-        try:
-            query_info = await datasette.get_canned_query(
-                database, query_name, request.actor
-            )
-            if query_info and "title" in query_info:
-                title = query_info["title"]
-        except (KeyError, TypeError):
-            pass
+        query = await datasette.get_query(database, query_name)
+        if query and query.title:
+            title = query.title
     fg.title(title)
 
     clean_function = clean
